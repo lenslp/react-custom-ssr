@@ -1,0 +1,20 @@
+{
+  "home": [
+    {
+      "key": 1,
+      "content": "BTC"
+    },
+    {
+      "key": 2,
+      "content": "ETH"
+    },
+    {
+      "key": 3,
+      "content": "MEME"
+    },
+    {
+      "key": 4,
+      "content": "DOGE"
+    }
+  ]
+}
