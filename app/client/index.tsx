@@ -26,6 +26,7 @@ const queryClient = new QueryClient({
 
 const getDehydratedState = () => {
   try {
+    // 从 DOM 中获取包含“脱水”状态的 script 标签（它被作为 JSON 数据容器使用）
     const element = document.querySelector("#__REACT_QUERY_STATE__");
     if (!element?.textContent) return {};
     return JSON.parse(element.textContent);

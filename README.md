@@ -38,7 +38,7 @@
 | 组件 | 作用 |
 | :--- | :--- |
 | **@loadable/component** | 处理按路由分包（Code Splitting）及 SSR 资源追踪。 |
-| **TanStack Query (v5)** | 统一前后端数据请求模型，负责状态的脱水与复水。 |
+| **TanStack Query (v5)** | 统一前后端数据请求模型，负责状态的脱水与注水。 |
 | **react-helmet-async** | 管理 SSR 环境下的动态 SEO 标签（Title, Meta, Lang）。 |
 | **Koa + @koa/router** | 提供底层 HTTP 服务，管理请求上下文。 |
 
