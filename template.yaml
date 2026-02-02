@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: nestjs function for collector service
+
+Resources:
+  NestApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: com
+      AlwaysDeploy: true
+      EndpointConfiguration:
+        Type: PRIVATE
+        VPCEndpointIds:
+          - vpce-xxx
+      Auth:
+        ResourcePolicy:
+          CustomStatements:
+            - Effect: Allow
+              Principal: '*'
+              Action: 'execute-api:Invoke'
+              Resource: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/*/*/*'
+            - Effect: 'Deny'
+              Principal: '*'
+              Action: 'execute-api:Invoke'
+              Resource: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/*/*/*'
+              Condition:
+                ForAnyValue:NotIpAddress:
+                  'aws:VpcSourceIp':
+                    - '172.0.0.0/24'
+                    - '172.0.1.0/24'
+
+  NestFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: '../dist'
+      Description: ''
+      MemorySize: 4096
+      Timeout: 30
+      Handler: serverless.handler
+      Runtime: nodejs20.x
+      Architectures:
+        - arm64
+      Events:
+        Api1:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+            RestApiId:
+              Ref: NestApi
+      EventInvokeConfig:
+        MaximumEventAgeInSeconds: 21600
+        MaximumRetryAttempts: 2
+      EphemeralStorage:
+        Size: 512
+      Environment:
+        Variables:
+          NODE_ENV: production
+
+      Layers:
+        - 'arn:aws:lambda:ap-northeast-1:580247275435:layer:LambdaInsightsExtension-Arm64:33'
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: Auto
+      SnapStart:
+        ApplyOn: None
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-xxx
+        SubnetIds:
+          - subnet-xxx
+          - subnet-xxx
+        Ipv6AllowedForDualStack: false
+      Role: arn:aws:iam::xxx:role/upex-role-upex-web-monitor-cos-com
+
+Outputs:
+  Api1:
+    Description: Please configure the following API Gateway endpoint in Nginx for path-based routing.
+    Value: !Sub 'https://${NestApi}.execute-api.${AWS::Region}.amazonaws.com/test/'

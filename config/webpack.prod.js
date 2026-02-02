@@ -1,17 +1,18 @@
 const { resolve } = require("path");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const { merge } = require("webpack-merge");
-const baseConfig = require("./webpack.config.js");
-const TerserPlugin = require("terser-webpack-plugin");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
-const CopyPlugin = require("copy-webpack-plugin");
-const HtmlWebpackInjectPreload = require("@principalstudio/html-webpack-inject-preload");
+const HtmlWebpackPlugin = require("html-webpack-plugin"); // 生成 HTML 文件
+const { merge } = require("webpack-merge"); // 合并配置
+const baseConfig = require("./webpack.config.js"); // 基础配置
+const TerserPlugin = require("terser-webpack-plugin"); // JS 压缩插件
+const MiniCssExtractPlugin = require("mini-css-extract-plugin"); // 提取 CSS 文件
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin"); // CSS 压缩插件
+const CopyPlugin = require("copy-webpack-plugin"); // 复制文件插件
+const HtmlWebpackInjectPreload = require("@principalstudio/html-webpack-inject-preload"); // 注入预加载资源
 
 const appConstants = require("./constants");
 
-const mode = "production";
+const mode = "production"; // 生产模式
 
+// 辅助函数：创建第三方库的独立代码块
 const createThirdpartyChunk = (chunkName, thirdPartyLibs) => ({
   [chunkName]: {
     chunks: "all",
@@ -22,29 +23,28 @@ const createThirdpartyChunk = (chunkName, thirdPartyLibs) => ({
   },
 });
 
+// --- 客户端生产配置 ---
 const prodClient = (env) => {
-  const isTest = /^test/.test(env.goal);
+  const isTest = /^test/.test(env.goal); // 判断是否为测试环境
 
   return merge(baseConfig.clent(env), {
     mode,
-    devtool: isTest ? "eval-source-map" : false,
+    devtool: isTest ? "eval-source-map" : false, // 生产环境通常不生成 Source Map 防止源码泄露
     output: {
-      filename: "js/[name].[contenthash:8].main.js",
-      chunkFilename: "js/[name].[contenthash:8].chunk.js",
-      assetModuleFilename: "media/[contenthash:8][ext]",
+      filename: "js/[name].[contenthash:8].main.js", // 使用 contenthash 保证内容更新时文件名才变
+      chunkFilename: "js/[name].[contenthash:8].chunk.js", // chunk 也使用哈希
+      assetModuleFilename: "media/[contenthash:8][ext]", // 静态资源指纹
     },
     optimization: {
-      minimize: true,
+      minimize: true, // 开启压缩
       minimizer: [
-        new TerserPlugin({
-          parallel: true,
-        }),
-        new CssMinimizerPlugin(),
+        new TerserPlugin({ parallel: true }), // 开启多进程并行压缩
+        new CssMinimizerPlugin(), // 压缩 CSS
       ],
-      runtimeChunk: {
+      runtimeChunk: { // 将 Webpack 运行时代码提取到独立文件
         name: "runtime",
       },
-      splitChunks: {
+      splitChunks: { // 代码分割策略
         chunks: "all",
         minSize: 30000,
         minRemainingSize: 30000,
@@ -53,14 +53,14 @@ const prodClient = (env) => {
         maxInitialRequests: 10,
         enforceSizeThreshold: 50000,
         cacheGroups: {
-          defaultVendors: {
+          defaultVendors: { // 提取 node_modules 里的第三方库
             test: /[\\/]node_modules[\\/]/,
             minChunks: 1,
             priority: -10,
             reuseExistingChunk: true,
           },
- 
-          default: {
+
+          default: { // 其他公共模块提取
             minChunks: 2,
             priority: -20,
             reuseExistingChunk: true,
@@ -69,14 +69,14 @@ const prodClient = (env) => {
       },
     },
     plugins: [
-      new HtmlWebpackPlugin({
+      new HtmlWebpackPlugin({ // 生成用于降级兜底的静态 index.html
         filename: "index.html",
         template: "public/index.ejs",
         inject: "body",
         templateParameters: {
           publicPath: appConstants.publicPath,
         },
-        minify: {
+        minify: { // 极致压缩 HTML 内容
           removeComments: true,
           collapseWhitespace: true,
           removeRedundantAttributes: true,
@@ -89,20 +89,15 @@ const prodClient = (env) => {
           minifyURLs: true,
         },
       }),
-      new MiniCssExtractPlugin({
+      new MiniCssExtractPlugin({ // 生产环境 CSS 文件加哈希命名
         filename: "css/[contenthash:5].css",
         chunkFilename: "css/[contenthash:5].css",
       }),
-      // new CopyPlugin({
-      //   patterns: [
-      //     { from: "public/audio", to: "audio" },
-      //     { from: "public/charting_library", to: "charting_library" },
-      //   ],
-      // }),
     ],
   });
 };
 
+// --- 服务端生产配置 ---
 const prodServer = (env) => merge(baseConfig.server(env), { mode });
 
-module.exports = [prodClient, prodServer];
+module.exports = [prodClient, prodServer]; // 导出成双端配置数组

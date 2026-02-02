@@ -16,6 +16,7 @@ const Index = () => {
         }}
       >
         <title>React custom ssr</title>
+        <meta name="description" content="React custom ssr" />
       </Helmet>
       <Outlet />
     </>
