@@ -24,8 +24,8 @@ export const getStartTemplate = ({
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   ${helmetTagNameList
-    .map((tagName) => helmetContext?.helmet?.[tagName].toString())
-    .join("")}
+      .map((tagName) => helmetContext?.helmet?.[tagName].toString())
+      .join("")}
   ${extractor.getLinkTags()}
   ${extractor.getStyleTags()}
 </head>

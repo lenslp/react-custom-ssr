@@ -29,4 +29,6 @@ app.use(
 );
 app.use(webpackHotMiddleware(clientCompiler));
 
-app.listen(appConstants.hmrPort, () => {});
+app.listen(appConstants.hmrPort, () => {
+  console.log(`HMR Server is running at http://localhost:${appConstants.hmrPort}`);
+});

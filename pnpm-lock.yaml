@@ -35,6 +35,9 @@ importers:
       koa-create-context:
         specifier: ^1.0.2
         version: 1.0.2(@types/koa@2.15.0)(koa@2.16.2)
+      koa-helmet:
+        specifier: ^9.0.0
+        version: 9.0.0(helmet@8.1.0)(koa@2.16.2)
       process:
         specifier: ^0.11.10
         version: 0.11.10
@@ -3222,6 +3225,10 @@ packages:
     resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==}
     hasBin: true
 
+  helmet@8.1.0:
+    resolution: {integrity: sha512-jOiHyAZsmnr8LqoPGmCjYAaiuWwjAPLgY8ZX2XrmHawt99/u1y6RgrZMTeoPfpUbV96HOalYgz1qzkRbw54Pmg==}
+    engines: {node: '>=18.0.0'}
+
   hoist-non-react-statics@3.3.2:
     resolution: {integrity: sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==}
 
@@ -3679,6 +3686,13 @@ packages:
     peerDependencies:
       '@types/koa': ^2.0.48
       koa: ^2.7.0
+
+  koa-helmet@9.0.0:
+    resolution: {integrity: sha512-RuYf19wAQ8twvWHUF4wF0TmJGl1EpOGkDruAXx1KAJm+GdBmbFjCdR09wr13D0IgxpfpsfCzDibC9542KvYRrg==}
+    engines: {node: '>= 18.0.0'}
+    peerDependencies:
+      helmet: ^6 || ^7 || ^8
+      koa: ^2 || ^3
 
   koa-mount@4.2.0:
     resolution: {integrity: sha512-2iHQc7vbA9qLeVq5gKAYh3m5DOMMlMfIKjW/REPAS18Mf63daCJHHVXY9nbu7ivrnYn5PiPC4CE523Tf5qvjeQ==}
@@ -9086,6 +9100,8 @@ snapshots:
 
   he@1.2.0: {}
 
+  helmet@8.1.0: {}
+
   hoist-non-react-statics@3.3.2:
     dependencies:
       react-is: 16.13.1
@@ -9575,6 +9591,11 @@ snapshots:
       koa: 2.16.2
       mock-req: 0.2.0
       mock-res: 0.5.0
+
+  koa-helmet@9.0.0(helmet@8.1.0)(koa@2.16.2):
+    dependencies:
+      helmet: 8.1.0
+      koa: 2.16.2
 
   koa-mount@4.2.0:
     dependencies:

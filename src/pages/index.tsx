@@ -7,15 +7,15 @@ const Index = () => {
   return (
     <>
       <Helmet
+        title="React custom ssr" // 直接使用属性设置标题，解决 TS 无法识别 <title> 标签的问题
         htmlAttributes={{
-          lang: locales,
+          lang: locales || "en",
           dir: "ltr",
         }}
         bodyAttributes={{
-          class: 'dark'
+          className: 'dark'
         }}
       >
-        <title>React custom ssr</title>
         <meta name="description" content="React custom ssr" />
       </Helmet>
       <Outlet />

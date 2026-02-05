@@ -1,42 +1,22 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: nestjs function for collector service
+Description: React Custom SSR function for serverless deployment
 
 Resources:
-  NestApi:
+  ReactSsrApi:
     Type: AWS::Serverless::Api
     Properties:
-      StageName: com
+      StageName: prod
       AlwaysDeploy: true
-      EndpointConfiguration:
-        Type: PRIVATE
-        VPCEndpointIds:
-          - vpce-xxx
-      Auth:
-        ResourcePolicy:
-          CustomStatements:
-            - Effect: Allow
-              Principal: '*'
-              Action: 'execute-api:Invoke'
-              Resource: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/*/*/*'
-            - Effect: 'Deny'
-              Principal: '*'
-              Action: 'execute-api:Invoke'
-              Resource: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/*/*/*'
-              Condition:
-                ForAnyValue:NotIpAddress:
-                  'aws:VpcSourceIp':
-                    - '172.0.0.0/24'
-                    - '172.0.1.0/24'
 
-  NestFunction:
+  SsrFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: '../dist'
-      Description: ''
+      CodeUri: ./
+      Description: 'React Custom SSR Handler'
       MemorySize: 4096
       Timeout: 30
-      Handler: serverless.handler
+      Handler: build/serverless.handler
       Runtime: nodejs20.x
       Architectures:
         - arm64
@@ -47,32 +27,12 @@ Resources:
             Path: /{proxy+}
             Method: ANY
             RestApiId:
-              Ref: NestApi
-      EventInvokeConfig:
-        MaximumEventAgeInSeconds: 21600
-        MaximumRetryAttempts: 2
-      EphemeralStorage:
-        Size: 512
+              Ref: ReactSsrApi
       Environment:
         Variables:
           NODE_ENV: production
 
-      Layers:
-        - 'arn:aws:lambda:ap-northeast-1:580247275435:layer:LambdaInsightsExtension-Arm64:33'
-      RuntimeManagementConfig:
-        UpdateRuntimeOn: Auto
-      SnapStart:
-        ApplyOn: None
-      VpcConfig:
-        SecurityGroupIds:
-          - sg-xxx
-        SubnetIds:
-          - subnet-xxx
-          - subnet-xxx
-        Ipv6AllowedForDualStack: false
-      Role: arn:aws:iam::xxx:role/upex-role-upex-web-monitor-cos-com
-
 Outputs:
-  Api1:
-    Description: Please configure the following API Gateway endpoint in Nginx for path-based routing.
-    Value: !Sub 'https://${NestApi}.execute-api.${AWS::Region}.amazonaws.com/test/'
+  ApiEndpoint:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${ReactSsrApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"

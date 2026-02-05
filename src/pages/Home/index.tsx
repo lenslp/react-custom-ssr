@@ -1,8 +1,7 @@
-import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useParams, Link } from "react-router-dom";
 import { PrefetchKeys } from "apis/queryKeys";
 import HomeService from "apis/services/Home";
-import { useEffect } from "react";
 
 const Home = () => {
   const params = useParams();

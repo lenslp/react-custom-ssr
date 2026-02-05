@@ -4,9 +4,9 @@
 
 ---
 
-## 核心架构：两阶段映射
+## 核心架构：两阶段映射与动静分离
 
-项目采用了 **“两阶段构建、三步走运行”** 的模型，通过 Webpack 的多编译器模式（Multi-compiler）确保前后端代码的隔离与协作。
+本项目采用了 **“两阶段构建、三步走运行”** 的模型，并通过 **“动静分离”** 架构适配现代云原生环境（如 AWS Serverless）。
 
 ### 1. 构建阶段 (Build Time)
 - **双端打包**：同时生成 `Client Bundle`（用于浏览器执行）和 `Server Bundle`（用于 Node.js 执行）。
@@ -55,3 +55,25 @@
 1. **LoadData 定义**：新增路由时，请务必在 `src/routes/index.tsx` 中定义 `loadData` 和 `queryKey`。
 2. **样式隔离**：推荐使用 `.module.less` 实现样式私有化，避免 SSR 时的全局样式冲突。
 3. **副作用控制**：确保组件的 `useEffect` 逻辑只在客户端运行，SSR 阶段不会执行。
+
+## 注意事项
+1. **数据隐私**：和后端约定好不要返回多余的字段，尤其是用户敏感信息。
+2. **安全性**：
+   - 已集成 `koa-helmet` 自动设置安全头。
+   - 关注 SSR CPU 密集型操作带来的 DDoS 风险，建议通过 CDN 或服务端降级应对。
+详细防护策略请参考 [SECURITY.md](./docs/SECURITY.md)。
+
+---
+
+## 部署架构 (Infrastructure)
+
+本项目天然适配 Serverless 环境，推荐采用 **S3 + CloudFront + Lambda** 的“金三角”方案：
+
+1. **Amazon S3 (存储层)**: 存放 `build/client/` 下的静态资源（JS/CSS/Image）。
+2. **AWS Lambda (计算层)**: 运行 `build/serverless.js`，负责路由匹配、数据预取及 HTML 流式渲染。
+3. **Amazon CloudFront (分发层)**: 
+   - 路径 `/static/*` 映射到 S3，加速静态资源加载。
+   - 其他路径 `/*` 转发至 Lambda，触发 SSR 逻辑。
+   - 利用边缘节点（Edge Locations）缓存静态资源，减少 S3 访问压力。
+
+详细指引请参考 [DEPLOYMENT.md](./docs/DEPLOYMENT.md) 和 [TECH_STACK.md](./docs/TECH_STACK.md)。

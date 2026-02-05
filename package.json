@@ -25,6 +25,7 @@
     "core-js": "^3.44.0",
     "koa": "^2.14.1",
     "koa-create-context": "^1.0.2",
+    "koa-helmet": "^9.0.0",
     "process": "^0.11.10",
     "qs": "^6.11.1",
     "react": "^19.1.0",
